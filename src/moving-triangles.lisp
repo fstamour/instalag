@@ -6,15 +6,37 @@
 (defparameter *loop* 0.0)
 (defparameter *transform* (m4:identity))
 
-(defconstant +triangle+
+(defvar +triangle+
   (list (v!  0.0   0.2  0.0  1.0)
         (v! -0.2  -0.2  0.0  1.0)
         (v!  0.2  -0.2  0.0  1.0)))
 
 (defun-g compute-position ((position :vec4) (id :float))
-  (let ((pos (v! (* (s~ position :xyz) 2.0) 1.0))
+  (let ((pos (v! (* (s~ position :xyz) 2.0) 50.0))
 	(i (float id)))
-    (+ pos (v! (sin (+ i *loop*)) i 0.0 0.0))))
+    (* *transform*
+       (+ pos (v! (sin (+ i *loop*)) i 0.0 0.0)))))
+
+(setf *transform*
+      (m4:+
+       (m4:translation (v! 0.0 0.0 10.0))
+       (destructuring-bind (width height)
+	   (viewport-dimensions (current-viewport))
+	 (let ((near 10)
+	       (far 100)
+	       (fov 90))
+	   (rtg-math.projection:perspective
+	    (coerce width 'single-float)
+	    (coerce height 'single-float)
+	    (coerce near 'single-float)
+	    (coerce far 'single-float)
+	    (coerce fov 'single-float))))))
+
+#+nil
+(setf *transform*
+      (m4:+
+       *transform*
+       (m4:translation (v! .2 .2 .2))))
 
 (defun-g compute-color ()
   (v! (sin *loop*) (cos *loop*) 0.5 1.0))
@@ -45,4 +67,5 @@
 
 (defun stop-loop ()
   (setf *running* nil))
+
 
