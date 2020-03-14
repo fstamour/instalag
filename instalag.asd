@@ -19,6 +19,7 @@
     :serial t
     :components
             ((:file package)
+	     (:file camera)
 	     (:file event)
              (:file moving-triangles)
              (:file main)))))
